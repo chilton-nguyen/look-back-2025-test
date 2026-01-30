@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Team 2025 Lookback - Listening Test</title>
+    <style>
+        :root {
+            --color-primary: #dc2626;
+            --color-dark: #1f2937;
+            --color-light: #f9fafb;
+            --color-accent: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: #1f2937;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            color: white;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.95;
+            position: relative;
+        }
+
+        .manga-strip {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            background: #f3f4f6;
+            overflow-x: auto;
+            border-bottom: 3px solid var(--color-primary);
+        }
+
+        .manga-strip img {
+            height: 180px;
+            width: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .manga-strip img:hover {
+            transform: scale(1.05);
+        }
+
+        .audio-section {
+            padding: 30px;
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        audio {
+            width: 100%;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .instructions {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 20px 30px;
+            border-radius: 8px;
+        }
+
+        .instructions h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .instructions ul {
+            color: #78350f;
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .questions-section {
+            padding: 30px;
+        }
+
+        .question {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .question:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+        }
+
+        .question-number {
+            background: var(--color-primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option:hover {
+            border-color: var(--color-primary);
+            background: #fef2f2;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+
+        .option label {
+            cursor: pointer;
+            font-size: 1rem;
+            color: #374151;
+            flex: 1;
+        }
+
+        .submit-section {
+            padding: 30px;
+            background: #f9fafb;
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .submit-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.pass {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        .result.fail {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .manga-strip img {
+                height: 120px;
+            }
+            
+            .question-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎧 RED TEAM 2025 Lookback - Listening Test</h1>
+            <p>IELTS-Style Listening Comprehension | Chi Tran & Arne Dialog</p>
+        </div>
+
+        <div class="manga-strip">
+            <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/2e1a6c34-4a14-4304-80ca-408a20627a08" alt="Manga page 1">
+            <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/00d65247-a0ed-4a7b-860d-7cb7c9c80145" alt="Manga page 2">
+            <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/5a82d32c-9828-4260-98cf-958aa02d018d" alt="Manga page 3">
+            <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/6e3423b7-d5e7-4a8c-9fce-eedbde8b6ffe" alt="Manga page 4">
+        </div>
+
+        <div class="audio-section">
+            <h3 style="margin-bottom: 15px; color: var(--color-dark); font-size: 1.2rem;">🎵 Listen to the conversation:</h3>
+            <audio controls id="audioPlayer">
+                <source src="AI-Test.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #6b7280;">
+                💡 Make sure to place the <strong>AI-Test.mp3</strong> file in the same folder as this HTML file before opening.
+            </p>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <ul>
+                <li>Listen to the audio conversation between Chi Tran and Arne</li>
+                <li>Answer 3 questions below (randomly selected from 9 total)</li>
+                <li>Choose the best answer for each question</li>
+                <li>You can replay the audio as many times as needed</li>
+            </ul>
+        </div>
+
+        <div class="questions-section" id="questionsContainer">
+            <!-- Questions will be inserted here by JavaScript -->
+        </div>
+
+        <div class="submit-section">
+            <button class="submit-btn" onclick="checkAnswers()">Submit Answers</button>
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const allQuestions = [
+            {
+                id: 1,
+                question: "What was the Red Team's main theme for 2025?",
+                options: [
+                    "Achieve perfection in every project",
+                    "Turn normal days into ACE achievements",
+                    "Work harder than other teams",
+                    "Focus only on technical excellence"
+                ],
+                correct: 1
+            },
+            {
+                id: 2,
+                question: "How many unit tests did the Red Team have at the beginning of 2025 for Online Report?",
+                options: [
+                    "Around 40 unit tests",
+                    "Around 60 unit tests",
+                    "Around 80 unit tests",
+                    "Around 98 unit tests"
+                ],
+                correct: 1
+            },
+            {
+                id: 3,
+                question: "Which charting tool did Red Team migrate FROM during 2025?",
+                options: [
+                    "ECharts",
+                    "Chart.js",
+                    "DevExtreme",
+                    "D3.js"
+                ],
+                correct: 2
+            },
+            {
+                id: 4,
+                question: "How many reports was Red Team maintaining by the end of 2025?",
+                options: [
+                    "3 reports",
+                    "4 reports",
+                    "6 reports",
+                    "8 reports"
+                ],
+                correct: 2
+            },
+            {
+                id: 5,
+                question: "What did Red Team automate regarding Request Demo?",
+                options: [
+                    "The testing process",
+                    "The deployment process",
+                    "The approval process",
+                    "The documentation process"
+                ],
+                correct: 2
+            },
+            {
+                id: 6,
+                question: "Which framework did Red Team become more mature in applying?",
+                options: [
+                    "Kanban",
+                    "Scrum",
+                    "Waterfall",
+                    "Agile general practices"
+                ],
+                correct: 1
+            },
+            {
+                id: 7,
+                question: "What was the BIGGEST challenge the Red Team faced in 2025?",
+                options: [
+                    "Meeting tight deadlines",
+                    "Learning new technologies",
+                    "Improving English communication skills",
+                    "Managing stakeholder expectations"
+                ],
+                correct: 2
+            },
+            {
+                id: 8,
+                question: "What did the team learn NOT to bring into work?",
+                options: [
+                    "Personal laptops",
+                    "Personal feelings",
+                    "Personal projects",
+                    "Personal schedules"
+                ],
+                correct: 1
+            },
+            {
+                id: 9,
+                question: "What does Red Team want to STOP doing in 2026?",
+                options: [
+                    "Using AI tools",
+                    "Working remotely",
+                    "Overthinking when there's no clear process",
+                    "Attending team meetings"
+                ],
+                correct: 2
+            }
+        ];
+
+        let selectedQuestions = [];
+        let userAnswers = {};
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function initQuiz() {
+            selectedQuestions = shuffleArray(allQuestions).slice(0, 3);
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            selectedQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <div class="question-text">
+                        <span class="question-number">${index + 1}</span>
+                        ${q.question}
+                    </div>
+                    <div class="options">
+                        ${q.options.map((option, optIndex) => `
+                            <div class="option">
+                                <input type="radio" 
+                                       id="q${index}_opt${optIndex}" 
+                                       name="question${index}" 
+                                       value="${optIndex}"
+                                       onchange="saveAnswer(${index}, ${optIndex})">
+                                <label for="q${index}_opt${optIndex}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function saveAnswer(questionIndex, optionIndex) {
+            userAnswers[questionIndex] = optionIndex;
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            const totalQuestions = selectedQuestions.length;
+
+            selectedQuestions.forEach((q, index) => {
+                if (userAnswers[index] === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            const resultDiv = document.getElementById('result');
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+            
+            resultDiv.className = 'result show';
+            
+            if (percentage >= 70) {
+                resultDiv.classList.add('pass');
+                resultDiv.innerHTML = `
+                    🎉 Excellent! You got ${correctCount} out of ${totalQuestions} correct (${percentage}%)!<br>
+                    <small>You understood the Red Team's 2025 journey very well!</small>
+                `;
+            } else {
+                resultDiv.classList.add('fail');
+                resultDiv.innerHTML = `
+                    📚 You got ${correctCount} out of ${totalQuestions} correct (${percentage}%).<br>
+                    <small>Try listening to the audio again and retake the test!</small>
+                `;
+            }
+
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
