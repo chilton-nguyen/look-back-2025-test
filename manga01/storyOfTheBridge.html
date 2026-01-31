@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RED Crew: The Bridge to ACE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Lora:ital,wght@0,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --fantasy-red: #8b0000;
+            --parchment: #f4e4bc;
+            --glass: rgba(0, 0, 0, 0.85); /* Darker for better visibility */
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: #000;
+            color: var(--parchment);
+            font-family: 'Lora', serif;
+            overflow: hidden;
+        }
+
+        /* --- BACKGROUND IMAGES --- */
+        #bg-container {
+            position: absolute; width: 100%; height: 100%;
+            top: 0; left: 0; z-index: 1;
+        }
+
+        .slide {
+            position: absolute; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 2s ease-in-out;
+        }
+
+        .slide.active { opacity: 1; transform: scale(1.05); transition: transform 30s linear, opacity 2s; }
+
+        /* --- UI OVERLAY --- */
+        .ui-overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Top: Legend Chapters */
+        #chapter-top {
+            width: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,1) 0%, transparent 100%);
+            padding: 30px 0;
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 1.6rem;
+            letter-spacing: 4px;
+        }
+
+        /* Middle: Synchronized Lyrics */
+        #lyric-middle {
+            background: var(--glass);
+            padding: 25px 50px;
+            border-radius: 5px;
+            border-top: 2px solid var(--gold);
+            border-bottom: 2px solid var(--gold);
+            max-width: 75%;
+            text-align: center;
+            font-size: 2.4rem;
+            font-style: italic;
+            color: #fff;
+            text-shadow: 0 0 10px #000;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
+        }
+
+        /* Bottom: Detailed Storytelling */
+        #story-bottom {
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,1) 80%, transparent 100%);
+            padding: 40px 15% 140px 15%;
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--parchment);
+            box-sizing: border-box;
+        }
+
+        /* Controls & Lyric Button */
+        .controls {
+            position: fixed; bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            pointer-events: auto;
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            background: var(--fantasy-red);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 25px;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            letter-spacing: 1px;
+        }
+
+        button:hover { background: #b00000; color: white; box-shadow: 0 0 15px var(--gold); }
+
+        /* Full Lyrics Modal */
+        #lyrics-modal {
+            display: none;
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%; height: 70%;
+            background: rgba(10, 10, 15, 0.95);
+            border: 2px solid var(--gold);
+            padding: 40px;
+            overflow-y: auto;
+            z-index: 200;
+            box-shadow: 0 0 50px #000;
+        }
+
+        #modal-content { white-space: pre-wrap; font-size: 1.1rem; line-height: 1.8; }
+    </style>
+</head>
+<body>
+
+    <div id="bg-container">
+        <div class="slide active" style="background-image: url('page01.png');"></div>
+        <div class="slide" style="background-image: url('page02.png');"></div>
+        <div class="slide" style="background-image: url('page03.png');"></div>
+        <div class="slide" style="background-image: url('page04.png');"></div>
+        <div class="slide" style="background-image: url('page05.png');"></div>
+        <div class="slide" style="background-image: url('page06.png');"></div>
+        <div class="slide" style="background-image: url('page08.png');"></div>
+    </div>
+
+    <div class="ui-overlay">
+        <div id="chapter-top">I: THE GATHERING</div>
+        <div id="lyric-middle">Ready to Begin the Voyage?</div>
+        <div id="story-bottom">The RED Crew assembles at the docks of HCMC...</div>
+    </div>
+
+    <div class="controls">
+        <button onclick="togglePlay()" id="playBtn">UNFURL SAILS (PLAY)</button>
+        <button onclick="toggleLyrics()">THE CAPTAIN'S SCROLL</button>
+    </div>
+
+    <div id="lyrics-modal">
+        <button onclick="toggleLyrics()" style="float: right; padding: 5px 10px;">CLOSE</button>
+        <h2 style="font-family: 'Cinzel'; color: var(--gold);">The RED Crew Shanty</h2>
+        <div id="modal-content"></div>
+    </div>
+
+    <audio id="audio" src="ACEShantyREDCrew.mp3"></audio>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const slides = document.querySelectorAll('.slide');
+        const chapterEl = document.getElementById('chapter-top');
+        const lyricEl = document.getElementById('lyric-middle');
+        const storyEl = document.getElementById('story-bottom');
+
+        // Full Lyrics from your provided content
+        const lyrics = [
+            "(Call) Ohh—haul away, haul away, crew!",
+            "(Response) Haul away—ACE is what we do!",
+            "We took plain days and made them gold,",
+            "RED sails up, brave and bold.",
+            "Beautiful work with a fiery flame,",
+            "Chill in the storm—we stay the same.",
+            "We spoke in English, voice held strong,",
+            "Made a few mistakes—still moved along.",
+            "Feedback straight but gentle too,",
+            "No hard feelings—just cleaner code to push through.",
+            "Heave-ho—turn the tide,",
+            "Normal days to ACE with pride.",
+            "Strike the drum, keep tempo tight,",
+            "Ship the work by morning light!",
+            "Charts like maps on ocean foam,",
+            "Docs and tasks to guide us home.",
+            "UX and security in the plan,",
+            "Estimate by proof—the sailor’s way.",
+            "Sixty percent was yesterday’s lore,",
+            "Ninety-eight now—unit tests shore to shore.",
+            "E2E rolling like thunder and sea,",
+            "Contract tests signed—no leaks in thee!",
+            "Old charts tossed, new standards drawn,",
+            "ECharts steady from dusk to dawn.",
+            "Manual approvals? Not anymore—",
+            "Auto-flow opened the harbor door.",
+            "Wave to RCP, the data runs free,",
+            "Like a fast black current under the sea.",
+            "Drop overthinking—let it go,",
+            "RED crew sailing—steady, slow… then go!"
+        ];
+
+        document.getElementById('modal-content').innerText = lyrics.join('\n');
+
+        // Chapters & Narratives for the 7 Pages
+        const chapters = [
+            "I: THE CRIMSON HARBOR", "II: FORGING THE GOLD", "III: THE SHARED TONGUE",
+            "IV: THE GALE OF FEEDBACK", "V: CHARTS OF THE SEA-FOAM", "VI: ANCHORS OF LOGIC", "VII: THE GATES OF AUTO-FLOW"
+        ];
+
+        const narratives = [
+            "At the edge of the world, the RED Crew gathers. Their vessel is fueled by ambition and the sharp scent of logic.",
+            "They strike the anvil of their daily work, turning the grey iron of routine into the brilliant gold of perfection.",
+            "In the market of the giants, they speak the common tongue. Every mistake is a lesson, every word a bridge built toward the horizon.",
+            "The winds of critique howl through the rigging. They do not fear the storm, for it trims their sails and cleans their course.",
+            "They navigate not by stars, but by maps of documented truth. UX and security are the shields they raise against the deep.",
+            "The hull is reinforced with ninety-eight layers of test-steel. Thunder rolls across the E2E waves, but the ship remains dry.",
+            "The manual chains are cast aside. The Auto-flow current takes hold, carrying the bridge to the legendary shores of ACE."
+        ];
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                document.getElementById('playBtn').innerText = "HOLD STEADY (PAUSE)";
+            } else {
+                audio.pause();
+                document.getElementById('playBtn').innerText = "UNFURL SAILS (PLAY)";
+            }
+        }
+
+        audio.ontimeupdate = () => {
+            const time = audio.currentTime;
+            const duration = 204; // 3:24
+
+            // Sync Slides, Chapters, and Stories (7 stages)
+            const slideIndex = Math.min(Math.floor((time / duration) * slides.length), slides.length - 1);
+            slides.forEach((s, i) => s.classList.toggle('active', i === slideIndex));
+            chapterEl.innerText = chapters[slideIndex];
+            storyEl.innerText = narratives[slideIndex];
+
+            // Sync Lyrics (Roughly distributed)
+            const lyricIndex = Math.min(Math.floor((time / duration) * lyrics.length), lyrics.length - 1);
+            lyricEl.innerText = lyrics[lyricIndex];
+        };
+
+        function toggleLyrics() {
+            const modal = document.getElementById('lyrics-modal');
+            modal.style.display = (modal.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
