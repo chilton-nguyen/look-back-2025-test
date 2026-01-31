@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Team 2025 Lookback | Assessment</title>
+    <style>
+        :root {
+            --primary: #ef4444;
+            --bg-dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-dark);
+            height: 100vh;
+            overflow: hidden; /* Keeps the main layout fixed */
+        }
+
+        /* --- Main Layout Split --- */
+        .dashboard {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* LEFT SIDE: QUIZ CONTENT */
+        .quiz-panel {
+            flex: 0 0 45%; /* Left side takes 45% */
+            background: #f8fafc;
+            height: 100%;
+            overflow-y: auto; /* Scrollable questions */
+            padding: 40px;
+            border-right: 1px solid var(--border);
+        }
+
+        /* RIGHT SIDE: IMAGE SLIDESHOW */
+        .media-panel {
+            flex: 1; /* Right side takes the rest */
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            object-fit: cover; /* Makes image fill the right side */
+        }
+
+        .slide.active { opacity: 1; }
+
+        /* --- Quiz UI Elements --- */
+        .header { margin-bottom: 30px; }
+        .header h1 { color: var(--primary); font-size: 1.8rem; margin-bottom: 5px; }
+
+        .audio-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        audio { width: 100%; }
+
+        .question-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .q-num { color: var(--primary); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; }
+        .q-text { font-size: 1.1rem; font-weight: 600; margin: 10px 0 20px 0; color: var(--text-main); }
+
+        .options-list { display: grid; gap: 10px; }
+        .option {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        .option:hover { background: #fef2f2; border-color: var(--primary); }
+        .option input { margin-right: 12px; accent-color: var(--primary); }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .submit-btn:disabled { opacity: 0.3; }
+
+        #result { margin-top: 20px; padding: 20px; border-radius: 12px; font-weight: 600; display: none; }
+        .pass { background: #dcfce7; color: #166534; }
+        .fail { background: #fee2e2; color: #991b1b; }
+
+        @media (max-width: 900px) {
+            .dashboard { flex-direction: column-reverse; overflow: auto; }
+            .quiz-panel { flex: none; width: 100%; height: auto; }
+            .media-panel { flex: none; width: 100%; height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <div class="quiz-panel">
+            <header class="header">
+                <h1>RED TEAM '25</h1>
+                <p>IELTS-Style Listening Test</p>
+            </header>
+
+            <div class="audio-box">
+                <p style="margin-bottom: 10px; font-weight: 600; font-size: 0.8rem;">🔈 AUDIO TRACK</p>
+                <audio controls>
+                    <source src="AI-Test.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <button id="submitBtn" class="submit-btn" onclick="checkAnswers()" disabled>Submit My Answers</button>
+            <div id="result"></div>
+        </div>
+
+        <div class="media-panel">
+            <div class="slide-container">
+                <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/2e1a6c34-4a14-4304-80ca-408a20627a08" class="slide active">
+                <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/00d65247-a0ed-4a7b-860d-7cb7c9c80145" class="slide">
+                <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/5a82d32c-9828-4260-98cf-958aa02d018d" class="slide">
+                <img src="https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/6e3423b7-d5e7-4a8c-9fce-eedbde8b6ffe" class="slide">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data and Logic from your original file
+        const allQuestions = [
+            { id: 1, question: "What was the Red Team's main theme for 2025?", options: ["Achieve perfection", "Turn normal days into ACE achievements", "Work harder", "Technical excellence"], correct: 1 },
+            { id: 2, question: "How many unit tests did they have at the start of 2025?", options: ["~40", "~60", "~80", "~98"], correct: 1 },
+            { id: 3, question: "Which tool did Red Team migrate FROM?", options: ["ECharts", "Chart.js", "DevExtreme", "D3.js"], correct: 2 },
+            { id: 4, question: "How many reports were being maintained by end of 2025?", options: ["3", "4", "6", "8"], correct: 2 },
+            { id: 5, question: "What was automated regarding Request Demo?", options: ["Testing", "Deployment", "Approval", "Documentation"], correct: 2 },
+            { id: 6, question: "Which framework did Red Team mature in applying?", options: ["Kanban", "Scrum", "Waterfall", "Agile"], correct: 1 },
+            { id: 7, question: "What was the BIGGEST challenge faced in 2025?", options: ["Deadlines", "New Tech", "English Skills", "Stakeholders"], correct: 2 },
+            { id: 8, question: "What did the team learn NOT to bring into work?", options: ["Laptops", "Personal feelings", "Personal projects", "Schedules"], correct: 1 },
+            { id: 9, question: "What does Red Team want to STOP doing in 2026?", options: ["AI Tools", "Remote work", "Overthinking", "Meetings"], correct: 2 }
+        ];
+
+        let selectedQuestions = [];
+        let userAnswers = {};
+
+        function init() {
+            // Randomly select 3 questions
+            selectedQuestions = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 3);
+            const container = document.getElementById('questionsContainer');
+            
+            selectedQuestions.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.innerHTML = `
+                    <div class="q-num">Question ${idx + 1}</div>
+                    <div class="q-text">${q.question}</div>
+                    <div class="options-list">
+                        ${q.options.map((opt, i) => `
+                            <label class="option">
+                                <input type="radio" name="q${idx}" value="${i}" onchange="save(${idx}, ${i})">
+                                ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            startSlideshow();
+        }
+
+        // Slideshow logic
+        function startSlideshow() {
+            let current = 0;
+            const slides = document.querySelectorAll('.slide');
+            setInterval(() => {
+                slides[current].classList.remove('active');
+                current = (current + 1) % slides.length;
+                slides[current].classList.add('active');
+            }, 5000); // Change image every 5 seconds
+        }
+
+        function save(qIdx, oIdx) {
+            userAnswers[qIdx] = oIdx;
+            if (Object.keys(userAnswers).length === 3) {
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        function checkAnswers() {
+            let score = 0;
+            selectedQuestions.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correct) score++;
+            });
+
+            const percent = Math.round((score / 3) * 100);
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = percent >= 70 ? 'pass' : 'fail';
+            resultDiv.innerHTML = `Score: ${percent}% (${score}/3 correct)<br><small>${percent >= 70 ? 'Excellent job!' : 'Try listening again.'}</small>`;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
